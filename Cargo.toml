@@ -14,7 +14,7 @@ name = "backend"
 path = "api/backend.rs"
 
 [dependencies]
-vercel_runtime = { version = "2", features = ["axum"] }
+vercel_runtime = { version = "2.4", features = ["axum"] }
 axum = "0.8"
 tower = "0.5"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time", "net"] }
