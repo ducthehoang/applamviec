@@ -1,0 +1,25 @@
+name: Auto Publish Scheduled Posts (Backup Cron)
+
+on:
+  schedule:
+    # Chạy định kỳ mỗi 5 phút làm phương án dự phòng song song với Supabase pg_cron (1 phút/lần)
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger-rust-publisher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gọi API Rust trên Vercel để xuất bản các bài tới giờ hẹn
+        env:
+          VERCEL_APP_URL: ${{ secrets.VERCEL_APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$VERCEL_APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Chưa cấu hình GitHub Secrets (VERCEL_APP_URL, CRON_SECRET), bỏ qua."
+            exit 0
+          fi
+          curl -fsS -X POST "${VERCEL_APP_URL%/}/api/rust/cron/publish" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json" \
+            -d '{"source":"github_actions"}'

@@ -1,0 +1,48 @@
+[package]
+name = "duoagency-hub"
+version = "0.1.0"
+edition = "2021"
+description = "Rust Serverless Backend for DuoAgency Hub (Google Drive + Facebook Graph API + TikTok Content Posting API)"
+
+[lib]
+name = "duoagency_backend"
+path = "src/lib.rs"
+
+# Gom toàn bộ API vào 1 Serverless Binary duy nhất để không vượt giới hạn 12 hàm của Vercel Hobby
+[[bin]]
+name = "backend"
+path = "api/backend.rs"
+
+[dependencies]
+vercel_runtime = { version = "2", features = ["axum"] }
+axum = "0.8"
+tower = "0.5"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time", "net"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# Sử dụng 100% rustls (không phụ thuộc OpenSSL C-lib để tránh lỗi build trên Vercel)
+sqlx = { version = "0.8", default-features = false, features = [
+    "runtime-tokio",
+    "tls-rustls-ring",
+    "postgres",
+    "derive",
+    "uuid",
+    "chrono",
+    "json"
+] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+    "json",
+    "stream",
+    "multipart"
+] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+url = "2.5"
+bytes = "1"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = 3
+strip = true
